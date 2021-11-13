@@ -153,3 +153,31 @@ end```
 ```bash
 $ vagrant up
 ```
+
+## 최신 커널 upgrade, 시간 동기화 설정
+- 시긴동기화 설정, Timezone 설정
+  - Controller 장비를 한국 공식 time server와 연결하고 나머지 노드는 Controller node와 연결하도록 한다.
+  ```bash
+  // chronyd 설치
+  $ apt update; apt -y upgrade
+  $ apt-get install -y chrony
+  // 한국 NTP server pool 및 접속 CIDR 설정
+  $ vi /etc/chrony/chrony.conf
+  ...
+  #pool ntp.ubuntu.com        iburst maxsources 4   // 주석 처리
+  #pool 0.ubuntu.pool.ntp.org iburst maxsources 1   // 주석 처리
+  #pool 1.ubuntu.pool.ntp.org iburst maxsources 1   // 주석 처리
+  #pool 2.ubuntu.pool.ntp.org iburst maxsources 2   // 주석 처리
+
+  # Korea public time server
+  server 0.kr.pool.ntp.org iburst
+  server 3.asia.pool.ntp.org iburst
+  server 1.asia.pool.ntp.org iburst
+
+  allow 10.0.0.0/24
+  ...
+
+  $ systemctl restart chronyd
+  $ chronyc sources -v
+
+  $ timedatectl set-timezone Asia/Seoul
