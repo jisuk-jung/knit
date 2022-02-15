@@ -1,5 +1,9 @@
-# Deploy kubernetes cluster using knit container
+- [Deploy kubernetes cluster using knit container](#deploy-kubernetes-cluster-using-knit-container)
+  - [Create VM with vagrant and virtualbox](#create-vm-with-vagrant-and-virtualbox)
+  - [페쇄망을 위한 local-repo, registry 백업 파일 만들기](#페쇄망을-위한-local-repo-registry-백업-파일-만들기)
+  - [Deploy k8s cluster to VM](#deploy-k8s-cluster-to-vm)
 
+# Deploy kubernetes cluster using knit container
 ## Create VM with vagrant and virtualbox
 
  [vagrant를 이용한 vm 생성](vagrant-virtualbox.md)
@@ -11,7 +15,7 @@
 ## Deploy k8s cluster to VM
 1. Make clean working directory.
 ```bash
-$ mkdir /tmp/knit; cd /tmp/knit
+$ mkdir /tmp/koreon; cd /tmp/koreon
 ```
 
 2. Generate ssh key and copy it to target servers
@@ -35,7 +39,7 @@ mycluster
 
   - Copy sample inventory files and modify it according to your environment
 ```bash
-$ docker run -it --name=knit --rm -v ${PWD}:/knit/work regi.k3.acornsoft.io/k3lab/knit:1.1.0 cp -R /knit/inventory/sample mycluster
+$ docker run -it --name=knit --rm -v ${PWD}:/knit/work regi.k3.acornsoft.io/k3lab/knit:1.1.1 cp -R /knit/inventory/sample mycluster
 $ cp local-repo.20210726_120901.tgz mycluster
 $ cp harbor.20210726_122024.tgz mycluster
 ```
@@ -148,7 +152,7 @@ haproxy: true
    
       
 ```bash
-$ docker run -it --name=knit --rm -v ${PWD}:/knit/work regi.k3.acornsoft.io/k3lab/knit:1.1.0 /bin/bash
+$ docker run -it --name=knit --rm -v ${PWD}:/knit/work regi.k3.acornsoft.io/k3lab/knit:1.1.1 /bin/bash
 
 # 대상 장비 접속 여부 확인하기(필수)
 $ ansible -i mycluster/inventory.ini -u root --private-key id_rsa  all -m ping
@@ -259,5 +263,6 @@ $ ansible-playbook -i mycluster/inventory.ini -u root --private-key id_rsa -e re
 
   - 클러스터 삭제하기
 ```bash
-$ ansible-playbook -i mycluster/inventory.ini -u root --private-key id_rsa ../scripts/reset.yml
+# optional [reset-cluster/reset-registry/reset-storage]
+$ ansible-playbook -i mycluster/inventory.ini -u root --private-key id_rsa --tags reset-cluster ../scripts/reset.yml
 ```
